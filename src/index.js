@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 
-var player, apples;
-var cursors;
+var player, cursors, apples;
 
 class MyGame extends Phaser.Scene {
     constructor() {
@@ -12,7 +11,8 @@ class MyGame extends Phaser.Scene {
 
     preload() {
         this.load.image('bg', 'src/assets/bg/hills(800x600).png');
-        //this.load.image('terrain', 'src/assets/terrain(16x16).png');
+        this.load.image('tiles', 'src/assets/tilesets/Terrain (16x16).png');
+        this.load.tilemapTiledJSON('map', 'src/assets/tilemaps/map2.json')
         this.load.spritesheet('playerIdle', 'src/assets/hero/Idle (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerRun', 'src/assets/hero/Run (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerJump', 'src/assets/hero/Jump (32x32).png', { frameWidth: 32, frameHeight: 32 });
@@ -22,6 +22,11 @@ class MyGame extends Phaser.Scene {
     create() {
         let back = this.add.image(this.WIDTH / 2, this.HEIGHT / 2, 'bg');
 
+        const map = this.make.tilemap({key: 'map'});
+        const tileset = map.addTilesetImage('map2-tileset', 'tiles');
+
+        var platforms = map.createLayer(0, tileset, 0,0);
+        platforms.setCollisionByExclusion([-1], true);
 
         //back.setOrigin(0)
         back.setScrollFactor(0);//fixedToCamera = true;
@@ -30,11 +35,13 @@ class MyGame extends Phaser.Scene {
 
         player = this.physics.add.sprite(400, 300, 'playerIdle');
         player.setCollideWorldBounds(true);
+        player.setBounce(0.2);
+        this.physics.add.collider(player, platforms);
         this.cameras.main.startFollow(player);
 
         apples = this.physics.add.staticGroup();
         apples.create(20, 500, 'apple');
-       
+
 
         this.anims.create({
             key: 'idle',
