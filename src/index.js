@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-var player, cursors, apples, melons, scoreText, appleScore = 0, melonScore = 0;
+var player, cursors, apples, melons, scoreText, appleScore = 0, melonScore = 0, hp = 3;
 
 class MyGame extends Phaser.Scene {
     constructor() {
@@ -49,8 +49,8 @@ class MyGame extends Phaser.Scene {
         melons.create(600, 490, 'melon');
         melons.create(600, 500, 'melon');
 
-        scoreText = this.add.text(16, 16, 'Apples: 0 Melons: 0', { fontSize: '32px', fill: '#000' });
-
+        scoreText = this.add.text(16, 16, 'Apples: 0 Melons: 0 HP: 3', { fontSize: '32px', fill: '#000' });
+        this.add.text(600, 580, 'Press Shift to Heal', { fontSize: '15px', fill: '#000' });
         this.anims.create({
             key: 'idle',
             frames: this.anims.generateFrameNumbers('playerIdle', { start: 0, end: 10 }),
@@ -112,6 +112,8 @@ class MyGame extends Phaser.Scene {
     }
 
     playerHit(player, spike) {
+        hp--;
+        scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
         player.setVelocity(0, 0);
         player.setX(50);
         player.setY(540);
@@ -130,14 +132,14 @@ class MyGame extends Phaser.Scene {
         apple.disableBody(true, true);
 
         appleScore += 1;
-        scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore);
+        scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
     }
 
     collectMelon(player, melon) {
         melon.disableBody(true, true);
 
         melonScore += 1;
-        scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore);
+        scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
     }
 
     update(time, delta) {
@@ -167,6 +169,14 @@ class MyGame extends Phaser.Scene {
             player.setVelocityY(-350);
             player.anims.play('jump', true);
         }
+        cursors.shift.on('down', function(event) {
+            if(appleScore >= 2 && melonScore >= 2) {
+                hp += 1;
+                melonScore = melonScore - 2;
+                appleScore = appleScore - 2;
+                scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
+            }
+        });
     }
 }
 
