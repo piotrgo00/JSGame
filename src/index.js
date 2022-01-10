@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-var player, cursors, apples, scoreText, score = 0;
+var player, cursors, apples, melons, scoreText, appleScore = 0, melonScore = 0;
 
 class MyGame extends Phaser.Scene {
     constructor() {
@@ -17,6 +17,7 @@ class MyGame extends Phaser.Scene {
         this.load.spritesheet('playerRun', 'src/assets/hero/Run (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerJump', 'src/assets/hero/Jump (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('apple', 'src/assets/fruits/Apple.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('melon', 'src/assets/fruits/Melon.png', { frameWidth: 32, frameHeight: 32 });
     }
 
     create() {
@@ -43,7 +44,11 @@ class MyGame extends Phaser.Scene {
         apples.create(20, 500, 'apple');
         apples.create(60, 500, 'apple');
 
-        scoreText = this.add.text(16, 16, 'Apples: 0', { fontSize: '32px', fill: '#000' });
+        melons = this.physics.add.staticGroup();
+        melons.create(600, 490, 'melon');
+        melons.create(600, 500, 'melon');
+
+        scoreText = this.add.text(16, 16, 'Apples: 0 Melons: 0', { fontSize: '32px', fill: '#000' });
 
         this.anims.create({
             key: 'idle',
@@ -79,8 +84,17 @@ class MyGame extends Phaser.Scene {
             repeat: -1
         });
 
+        this.anims.create({
+            key: 'melonIdle',
+            frames: this.anims.generateFrameNumbers('melon', { start: 0, end: 14 }),
+            frameRate: 35,
+            repeat: -1
+        });
+
         apples.getChildren().forEach(c => c.anims.play('appleIdle', true));
         this.physics.add.overlap(player, apples, this.collectApple, null, this);
+        melons.getChildren().forEach(c => c.anims.play('melonIdle', true));
+        this.physics.add.overlap(player, melons, this.collectMelon, null, this);
 
         cursors = this.input.keyboard.createCursorKeys();
     }
@@ -88,8 +102,15 @@ class MyGame extends Phaser.Scene {
     collectApple(player, apple) {
         apple.disableBody(true, true);
 
-        score += 1;
-        scoreText.setText('Apples: ' + score);
+        appleScore += 1;
+        scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore);
+    }
+
+    collectMelon(player, melon) {
+        melon.disableBody(true, true);
+
+        melonScore += 1;
+        scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore);
     }
 
     update(time, delta) {
