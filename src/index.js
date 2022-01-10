@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-var player, cursors, apples;
+var player, cursors, apples, scoreText, score = 0;
 
 class MyGame extends Phaser.Scene {
     constructor() {
@@ -41,7 +41,9 @@ class MyGame extends Phaser.Scene {
 
         apples = this.physics.add.staticGroup();
         apples.create(20, 500, 'apple');
+        apples.create(60, 500, 'apple');
 
+        scoreText = this.add.text(16, 16, 'Apples: 0', { fontSize: '32px', fill: '#000' });
 
         this.anims.create({
             key: 'idle',
@@ -84,7 +86,10 @@ class MyGame extends Phaser.Scene {
     }
 
     collectApple(player, apple) {
-        apple.disableBody(true, true); //TODO add apple to score?
+        apple.disableBody(true, true);
+
+        score += 1;
+        scoreText.setText('Apples: ' + score);
     }
 
     update(time, delta) {
