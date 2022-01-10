@@ -22,6 +22,10 @@ class MyGame extends Phaser.Scene {
     }
 
     create() {
+        appleScore = 0;
+        melonScore = 0;
+        hp = 3;
+
         let back = this.add.image(this.WIDTH / 2, this.HEIGHT / 2, 'bg');
 
         const map = this.make.tilemap({key: 'map'});
@@ -136,9 +140,6 @@ class MyGame extends Phaser.Scene {
         });
         if(hp <= 0) {
             this.scene.restart();
-            appleScore = 0;
-            melonScore = 0;
-            hp = 3;
         }
     }
 
