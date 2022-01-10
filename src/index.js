@@ -126,6 +126,12 @@ class MyGame extends Phaser.Scene {
             ease: 'Linear',
             repeat: 5,
         });
+        if(hp <= 0) {
+            this.scene.restart();
+            appleScore = 0;
+            melonScore = 0;
+            hp = 3;
+        }
     }
 
     collectApple(player, apple) {
