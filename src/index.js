@@ -17,6 +17,7 @@ class MyGame extends Phaser.Scene {
         this.load.spritesheet('playerRun', 'src/assets/hero/Run (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerJump', 'src/assets/hero/Jump (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('apple', 'src/assets/fruits/Apple.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.image('spike', 'src/assets/traps/Idle.png')
     }
 
     create() {
@@ -33,7 +34,7 @@ class MyGame extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, 800, 600);
         this.physics.world.setBounds(0, 0, 800, 600);
 
-        player = this.physics.add.sprite(400, 300, 'playerIdle');
+        player = this.physics.add.sprite(50, 540, 'playerIdle');
         player.setCollideWorldBounds(true);
         player.setBounce(0.2);
         this.physics.add.collider(player, platforms);
@@ -81,6 +82,32 @@ class MyGame extends Phaser.Scene {
         this.physics.add.overlap(player, apples, this.collectApple, null, this);
 
         cursors = this.input.keyboard.createCursorKeys();
+
+        // <--- Spikes --->
+        this.spikes = this.physics.add.group({
+            allowGravity: false,
+            immovable: true
+        })
+        map.getObjectLayer('Spikes').objects.forEach((spike) => {
+            // Add new spikes to our sprite group
+            const spikeSprite = this.spikes.create(spike.x, spike.y - 16, 'spike').setOrigin(0);
+        });
+        this.physics.add.collider(player, this.spikes, this.playerHit, null, this);
+    }
+
+    playerHit(player, spike) {
+        player.setVelocity(0, 0);
+        player.setX(50);
+        player.setY(540);
+        player.play('idle', true);
+        player.setAlpha(0);
+        let tw = this.tweens.add({
+            targets: player,
+            alpha: 1,
+            duration: 100,
+            ease: 'Linear',
+            repeat: 5,
+        });
     }
 
     collectApple(player, apple) {
