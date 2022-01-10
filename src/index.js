@@ -42,12 +42,12 @@ class MyGame extends Phaser.Scene {
         this.cameras.main.startFollow(player);
 
         apples = this.physics.add.staticGroup();
-        apples.create(20, 500, 'apple');
-        apples.create(60, 500, 'apple');
-
         melons = this.physics.add.staticGroup();
-        melons.create(600, 490, 'melon');
-        melons.create(600, 500, 'melon');
+        this.createCollectable(map, apples, 'Apples', 'apple');
+        this.createCollectable(map, melons, 'Melons', 'melon');
+
+
+
 
         scoreText = this.add.text(16, 16, 'Apples: 0 Melons: 0 HP: 3', { fontSize: '32px', fill: '#000' });
         this.add.text(600, 580, 'Press Shift to Heal', { fontSize: '15px', fill: '#000' });
@@ -92,7 +92,9 @@ class MyGame extends Phaser.Scene {
             repeat: -1
         });
 
-        apples.getChildren().forEach(c => c.anims.play('appleIdle', true));
+        apples.getChildren().forEach(c => {
+            c.anims.play('appleIdle', true)
+        });
         this.physics.add.overlap(player, apples, this.collectApple, null, this);
         melons.getChildren().forEach(c => c.anims.play('melonIdle', true));
         this.physics.add.overlap(player, melons, this.collectMelon, null, this);
@@ -109,6 +111,12 @@ class MyGame extends Phaser.Scene {
             const spikeSprite = this.spikes.create(spike.x, spike.y - 16, 'spike').setOrigin(0);
         });
         this.physics.add.collider(player, this.spikes, this.playerHit, null, this);
+    }
+
+    createCollectable(map, fruits, fruitsTileMapId, fruitId) {
+        map.getObjectLayer(fruitsTileMapId).objects.forEach(fruit => {
+            fruits.create(fruit.x + 16, fruit.y - 16, fruitId);
+        })
     }
 
     playerHit(player, spike) {
