@@ -28,7 +28,6 @@ class MyGame extends Phaser.Scene {
 
         player = this.physics.add.sprite(400, 300, 'playerIdle');
         player.setCollideWorldBounds(true);
-        player.setBounce(0.2);
         this.cameras.main.startFollow(player);
 
         this.anims.create({
@@ -51,6 +50,12 @@ class MyGame extends Phaser.Scene {
             repeat: -1
           });
 
+          this.anims.create({
+            key: 'jump',
+            frames: this.anims.generateFrameNumbers('playerJump', { start: 0, end: 0 }),
+            frameRate: 20,
+            repeat: -1
+          });
 
         cursors = this.input.keyboard.createCursorKeys();
     }
@@ -59,21 +64,28 @@ class MyGame extends Phaser.Scene {
         super.update(time, delta);
         if (cursors.left.isDown) {
             player.setVelocityX(-150);
-            player.anims.play('left', true);
+            if(player.body.touching.down || player.body.onFloor()) {
+                player.anims.play('left', true);
+            }
             player.flipX = true;
         }
         else if (cursors.right.isDown) {
             player.setVelocityX(150);
-            player.anims.play('right', true);
+            if(player.body.touching.down || player.body.onFloor()) {
+                player.anims.play('right', true);
+            }
             player.flipX = false;
         }
         else {
             player.setVelocityX(0);
-            player.anims.play('idle', true);
+            if(player.body.touching.down || player.body.onFloor()) {
+                player.anims.play('idle', true);
+            }
         }
 
         if (cursors.up.isDown && (player.body.touching.down || player.body.onFloor())) {
             player.setVelocityY(-250);
+            player.anims.play('jump', true);
         }
     }
 }
