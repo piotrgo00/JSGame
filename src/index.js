@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-var player, cursors, apples, melons, scoreText, appleScore = 0, melonScore = 0, hp = 3;
+var player, cursors, apples, melons, scoreText, appleScore = 0, melonScore = 0, hp = 3, level=1, allFruits = 0;
 
 class MyGame extends Phaser.Scene {
     constructor() {
@@ -12,7 +12,8 @@ class MyGame extends Phaser.Scene {
     preload() {
         this.load.image('bg', 'src/assets/bg/hills(800x600).png');
         this.load.image('tiles', 'src/assets/tilesets/Terrain (16x16).png');
-        this.load.tilemapTiledJSON('map', 'src/assets/tilemaps/map2.json')
+
+        this.load.tilemapTiledJSON('map', `src/assets/tilemaps/map${level+1}.json`)
         this.load.spritesheet('playerIdle', 'src/assets/hero/Idle (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerRun', 'src/assets/hero/Run (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerJump', 'src/assets/hero/Jump (32x32).png', { frameWidth: 32, frameHeight: 32 });
@@ -24,6 +25,14 @@ class MyGame extends Phaser.Scene {
     create() {
         appleScore = 0;
         melonScore = 0;
+        allFruits = 0;
+        var timer = this.time.addEvent({
+            delay: 1000,
+            callback: this.checkWin,
+            callbackScope: this,
+            loop: true
+        })
+
         hp = 3;
 
         let back = this.add.image(this.WIDTH / 2, this.HEIGHT / 2, 'bg');
@@ -120,6 +129,7 @@ class MyGame extends Phaser.Scene {
     createCollectable(map, fruits, fruitsTileMapId, fruitId) {
         map.getObjectLayer(fruitsTileMapId).objects.forEach(fruit => {
             fruits.create(fruit.x + 16, fruit.y - 16, fruitId);
+            allFruits+=1;
         })
     }
 
@@ -145,16 +155,32 @@ class MyGame extends Phaser.Scene {
 
     collectApple(player, apple) {
         apple.disableBody(true, true);
-
         appleScore += 1;
         scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
     }
 
     collectMelon(player, melon) {
         melon.disableBody(true, true);
-
         melonScore += 1;
         scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
+
+    }
+    checkWin(){
+        if(allFruits <= appleScore + melonScore)
+            this.changeLevel();
+    }
+
+    changeLevel(){
+        if (level === 1){
+            level += 1;
+            this.scene.restart()
+
+        }
+        else {
+            level = 1
+            this.scene.restart();
+            hp = 3;
+        }
     }
 
     update(time, delta) {
