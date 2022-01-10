@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
-var player, cursors;
+var player, apples;
+var cursors;
 
 class MyGame extends Phaser.Scene {
     constructor() {
@@ -15,6 +16,7 @@ class MyGame extends Phaser.Scene {
         this.load.spritesheet('playerIdle', 'src/assets/hero/Idle (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerRun', 'src/assets/hero/Run (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerJump', 'src/assets/hero/Jump (32x32).png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('apple', 'src/assets/fruits/Apple.png', { frameWidth: 32, frameHeight: 32 });
     }
 
     create() {
@@ -29,6 +31,10 @@ class MyGame extends Phaser.Scene {
         player = this.physics.add.sprite(400, 300, 'playerIdle');
         player.setCollideWorldBounds(true);
         this.cameras.main.startFollow(player);
+
+        apples = this.physics.add.staticGroup();
+        apples.create(20, 500, 'apple');
+       
 
         this.anims.create({
             key: 'idle',
@@ -52,25 +58,39 @@ class MyGame extends Phaser.Scene {
 
           this.anims.create({
             key: 'jump',
-            frames: this.anims.generateFrameNumbers('playerJump', { start: 0, end: 0 }),
+            frames: [{ key: 'playerJump', frame: 0 }],
             frameRate: 20,
             repeat: -1
           });
 
+          this.anims.create({
+            key: 'appleIdle',
+            frames: this.anims.generateFrameNumbers('apple', { start: 0, end: 14 }),
+            frameRate: 35,
+            repeat: -1
+        });
+
+        apples.getChildren().forEach(c => c.anims.play('appleIdle', true));
+        this.physics.add.overlap(player, apples, this.collectApple, null, this);
+
         cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    collectApple(player, apple) {
+        apple.disableBody(true, true); //TODO add apple to score?
     }
 
     update(time, delta) {
         super.update(time, delta);
         if (cursors.left.isDown) {
-            player.setVelocityX(-150);
+            player.setVelocityX(-250);
             if(player.body.touching.down || player.body.onFloor()) {
                 player.anims.play('left', true);
             }
             player.flipX = true;
         }
         else if (cursors.right.isDown) {
-            player.setVelocityX(150);
+            player.setVelocityX(250);
             if(player.body.touching.down || player.body.onFloor()) {
                 player.anims.play('right', true);
             }
@@ -84,7 +104,7 @@ class MyGame extends Phaser.Scene {
         }
 
         if (cursors.up.isDown && (player.body.touching.down || player.body.onFloor())) {
-            player.setVelocityY(-250);
+            player.setVelocityY(-350);
             player.anims.play('jump', true);
         }
     }
@@ -98,7 +118,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            gravity: { y: 600 },
             debug: false
         }
     },
