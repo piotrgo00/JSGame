@@ -151,6 +151,7 @@ class MyGame extends Phaser.Scene {
             repeat: 5,
         });
         if(hp <= 0) {
+            level = 1;
             this.scene.restart();
         }
     }
@@ -169,7 +170,7 @@ class MyGame extends Phaser.Scene {
         this.checkWin();
     }
     checkWin(){
-        if(1 <= appleScore + melonScore && level !== 2){
+        if(allFruits <= appleScore + melonScore && level !== 2){
             level += 1;
             this.scene.restart();
         }
