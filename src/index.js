@@ -1,19 +1,21 @@
 import Phaser from 'phaser';
 
-var player, cursors, apples, melons, scoreText, appleScore = 0, melonScore = 0, hp = 3, level=1, allFruits = 0;
+var player, cursors, apples, melons, scoreText, appleScore = 0, melonScore = 0, hp = 3, allFruits = 0;
+let level = 1;
 
 class MyGame extends Phaser.Scene {
     constructor() {
         super();
         this.WIDTH = 800;
         this.HEIGHT = 600;
+
     }
 
     preload() {
         this.load.image('bg', 'src/assets/bg/hills(800x600).png');
         this.load.image('tiles', 'src/assets/tilesets/Terrain (16x16).png');
 
-        this.load.tilemapTiledJSON('map', `src/assets/tilemaps/map${level+1}.json`)
+        this.load.tilemapTiledJSON(`map${level}`, `src/assets/tilemaps/map${level}.json`)
         this.load.spritesheet('playerIdle', 'src/assets/hero/Idle (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerRun', 'src/assets/hero/Run (32x32).png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('playerJump', 'src/assets/hero/Jump (32x32).png', { frameWidth: 32, frameHeight: 32 });
@@ -27,7 +29,7 @@ class MyGame extends Phaser.Scene {
         melonScore = 0;
         allFruits = 0;
         var timer = this.time.addEvent({
-            delay: 1000,
+            delay: 2000,
             callback: this.checkWin,
             callbackScope: this,
             loop: true
@@ -37,7 +39,7 @@ class MyGame extends Phaser.Scene {
 
         let back = this.add.image(this.WIDTH / 2, this.HEIGHT / 2, 'bg');
 
-        const map = this.make.tilemap({key: 'map'});
+        const map = this.make.tilemap({key: `map${level}`});
         const tileset = map.addTilesetImage('map2-tileset', 'tiles');
 
         var platforms = map.createLayer(0, tileset, 0,0);
@@ -166,22 +168,14 @@ class MyGame extends Phaser.Scene {
 
     }
     checkWin(){
-        if(allFruits <= appleScore + melonScore)
-            this.changeLevel();
-    }
-
-    changeLevel(){
-        if (level === 1){
+        if(allFruits <= appleScore + melonScore && level !== 2){
             level += 1;
-            this.scene.restart()
-
-        }
-        else {
-            level = 1
             this.scene.restart();
-            hp = 3;
         }
+
     }
+
+
 
     update(time, delta) {
         super.update(time, delta);
@@ -221,6 +215,7 @@ class MyGame extends Phaser.Scene {
     }
 }
 
+
 const config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
@@ -236,4 +231,4 @@ const config = {
     scene: MyGame
 };
 
-const game = new Phaser.Game(config);
+let game = new Phaser.Game(config);
