@@ -169,7 +169,7 @@ class MyGame extends Phaser.Scene {
         this.checkWin();
     }
     checkWin(){
-        if(allFruits <= appleScore + melonScore && level !== 2){
+        if(1 <= appleScore + melonScore && level !== 2){
             level += 1;
             this.scene.restart();
         }
