@@ -28,12 +28,12 @@ class MyGame extends Phaser.Scene {
         appleScore = 0;
         melonScore = 0;
         allFruits = 0;
-        var timer = this.time.addEvent({
+        /*var timer = this.time.addEvent({
             delay: 2000,
             callback: this.checkWin,
             callbackScope: this,
             loop: true
-        })
+        })*/
 
         hp = 3;
 
@@ -159,13 +159,14 @@ class MyGame extends Phaser.Scene {
         apple.disableBody(true, true);
         appleScore += 1;
         scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
+        this.checkWin();
     }
 
     collectMelon(player, melon) {
         melon.disableBody(true, true);
         melonScore += 1;
         scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
-
+        this.checkWin();
     }
     checkWin(){
         if(allFruits <= appleScore + melonScore && level !== 2){
@@ -209,6 +210,7 @@ class MyGame extends Phaser.Scene {
                 hp += 1;
                 melonScore = melonScore - 2;
                 appleScore = appleScore - 2;
+                allFruits -= 4
                 scoreText.setText('Apples: ' + appleScore + ' Melons: ' + melonScore + ' HP: ' + hp);
             }
         });
